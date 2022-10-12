@@ -7,12 +7,38 @@
   <title>Sonar Demo</title>
   <link rel="stylesheet" type="text/css" href="static/css/app.css" />
   <script type="text/javascript" src="static/js/app.js" ></script>
+  <script type="text/javascript" src="static/js/spectrogram.js" ></script>
+  <script type="text/javascript" src="static/js/pffft/pffft.simd.js"></script>
+  <script type="text/javascript" src="static/js/microphone.js" ></script>
+  <script type="text/javascript" src="static/js/signal_processing.js" ></script>
 </head>
 <body>
   <canvas id="canvas"></canvas>
 
   <script type="text/javascript">
-    const app = new App(document.getElementById('canvas'));
+    const app = new SpectrogramApp(document.getElementById('canvas'));
+    const microphone = new Microphone();
+    const sliding_window = new SlidingWindow(1024, 512);
+    const fft = new Fft(1024);
+
+    // send microphone data into a sliding window
+    microphone.event_listeners.push((e) => {
+      e.inputBuffer.getChannelData(0).forEach(element => {
+        sliding_window.push(element);
+      });
+    });
+
+    // take windows of data from the sliding window and take the FFT of it
+    sliding_window.event_listeners.push((window) => {
+      fft.getFrequencies(Float32Array.from(window));
+    });
+
+    // get FFT results and render it on the spectrogram
+    fft.event_listeners.push((fft_magnitudes) => {
+      if (fft_magnitudes != null) {
+        app.push(fft_magnitudes, {z_scale: 100000});
+      }
+    });
   </script>
 </body>
 </html>
