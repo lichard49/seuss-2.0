@@ -2,7 +2,11 @@
 class Microphone {
   constructor(buffer_size) {
     navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: {
+        sampleRate: 44100,
+        channelCount: 1,
+        volume: 1.0
+    },
       video: false
     }).then((stream) => {
       this.handlePermissionSuccess(stream);
@@ -14,7 +18,7 @@ class Microphone {
 
   // called when user gives permission to use the microphone
   handlePermissionSuccess(stream) {
-    const context = new AudioContext();
+    const context = new AudioContext({sampleRate: 44100});
     const source = context.createMediaStreamSource(stream);
     const processor = context.createScriptProcessor(this.buffer_size, 1, 1);
 

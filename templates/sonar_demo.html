@@ -11,9 +11,16 @@
   <script type="text/javascript" src="static/js/pffft/pffft.simd.js"></script>
   <script type="text/javascript" src="static/js/microphone.js" ></script>
   <script type="text/javascript" src="static/js/signal_processing.js" ></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.48/Tone.js" integrity="sha512-jhAfSzX/sGhuTEnq48xvglsrDI33dNcmsrEbx45YMkd3K0s8eMIeIsgLZav6gQ5xpwMFUioN6iy7YbEOAzzUiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
   <canvas id="canvas"></canvas>
+
+  <div id="settings_modal">
+    <p>Settings</p>
+    <button id="play_sound_button">Play carrier wave</button>
+  </div>
 
   <script type="text/javascript">
     const app = new SpectrogramApp(document.getElementById('canvas'));
@@ -36,9 +43,21 @@
     // get FFT results and render it on the spectrogram
     fft.event_listeners.push((fft_magnitudes) => {
       if (fft_magnitudes != null) {
-        app.push(fft_magnitudes, {z_scale: 100000});
+        app.push(fft_magnitudes.slice(395, 415), {z_scale: 5000});
       }
     });
+
+    const osc = new Tone.Oscillator(19000, 'sine').toDestination();
+    let playing = false;
+    document.getElementById('play_sound_button').addEventListener('click', (e) => {
+      playing = !playing;
+
+      if (playing) {
+        osc.start();
+      } else {
+        osc.stop();
+      }
+    })
   </script>
 </body>
 </html>

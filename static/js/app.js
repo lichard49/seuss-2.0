@@ -22,11 +22,8 @@ class App {
   }
 
   createSettingsModal() {
-    this.div = document.createElement('div');
-    this.div.id = 'settings_modal';
+    this.div = document.getElementById('settings_modal');
     this.div.hidden = true;
-    this.div.textContent = 'Settings';
-    document.body.appendChild(this.div);
   }
 
   toggleSettingsModal() {

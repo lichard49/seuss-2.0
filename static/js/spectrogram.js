@@ -6,6 +6,9 @@ class SpectrogramApp extends App {
 
   // add a sample of data to the spectrogram image
   push(column_data, {flip=true, z_scale=1}={}) {
+    // fit column size to height of screen
+    column_data = this.interpolateArray(column_data, this.canvas.height);
+
     // create a new column of the image
     const column_image = this.context.createImageData(1, column_data.length);
 
@@ -29,4 +32,23 @@ class SpectrogramApp extends App {
     // render new column
     app.context.putImageData(column_image, this.canvas.width - 1, 0);
   }
+
+  linearInterpolate(before, after, at_point) {
+    return before + (after - before) * at_point;
+  };
+
+  interpolateArray(data, fit_count) {
+    const new_data = new Array();
+    const spring_factor = new Number((data.length - 1) / (fit_count - 1));
+    new_data[0] = data[0]; // for new allocation
+    for (let i = 1; i < fit_count - 1; i++) {
+      const tmp = i * spring_factor;
+      const before = new Number(Math.floor(tmp)).toFixed();
+      const after = new Number(Math.ceil(tmp)).toFixed();
+      const at_point = tmp - before;
+      new_data[i] = this.linearInterpolate(data[before], data[after], at_point);
+    }
+    new_data[fit_count - 1] = data[data.length - 1]; // for new allocation
+    return new_data;
+  };
 }
