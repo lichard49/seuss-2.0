@@ -19,7 +19,6 @@ class Microphone {
   // called when user gives permission to use the microphone
   handlePermissionSuccess(stream) {
     const context = new AudioContext({sampleRate: 44100});
-    console.log(context.sampleRate);
     const source = context.createMediaStreamSource(stream);
     const processor = context.createScriptProcessor(this.buffer_size, 1, 1);
 
