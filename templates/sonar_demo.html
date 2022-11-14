@@ -19,7 +19,9 @@
 
   <div id="settings_modal">
     <p>Settings</p>
-    <button id="play_sound_button">Play carrier wave</button>
+    <label for="freq">Frequency:</label>
+    <input type="number" id="frequency" name="frequency">
+    <button id="play_sound_button">ENTER</button>
   </div>
 
   <script type="text/javascript">
@@ -43,18 +45,21 @@
     // get FFT results and render it on the spectrogram
     fft.event_listeners.push((fft_magnitudes) => {
       if (fft_magnitudes != null) {
-        app.push(fft_magnitudes.slice(395, 415), {z_scale: 5000});
+          app.push(fft_magnitudes.slice(395, 415), {z_scale: 5000});
+          app.push(fft_magnitudes, {z_scale: 500000});
       }
     });
-
-    const osc = new Tone.Oscillator(19000, 'sine').toDestination();
+    const osc = new Tone.Oscillator(0, 'sine').toDestination();
     let playing = false;
     document.getElementById('play_sound_button').addEventListener('click', (e) => {
-      playing = !playing;
-
-      if (playing) {
+      playing = !playing;  
+      if (playing) { 
+        let freq = document.getElementById('frequency').value;
+        osc.frequency.value = freq;
+        document.getElementById('play_sound_button').innerHTML="PAUSE";
         osc.start();
       } else {
+        document.getElementById('play_sound_button').innerHTML="PLAY";
         osc.stop();
       }
     })
