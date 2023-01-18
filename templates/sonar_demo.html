@@ -21,6 +21,10 @@
     <p>Settings</p>
     <label for="freq">Frequency:</label>
     <input type="number" id="frequency" name="frequency">
+    <label for="freq">Increase In Frequency:</label>
+    <input type="number" id="increase" name="increase">
+    <label for="freq">Number of Seconds:</label>
+    <input type="number" id="time" name="time">
     <button id="play_sound_button">ENTER</button>
   </div>
 
@@ -49,20 +53,36 @@
           app.push(fft_magnitudes, {z_scale: 500000});
       }
     });
-    const osc = new Tone.Oscillator(0, 'sine').toDestination();
+    const osc = new Tone.Oscillator().toDestination();
+    osc.type = 'sine';
     let playing = false;
     document.getElementById('play_sound_button').addEventListener('click', (e) => {
-      playing = !playing;  
-      if (playing) { 
+      playing = !playing;
+        let secs = document.getElementById('time').value;
+          secs = parseFloat(secs);
+          let intervalId = window.setInterval(function(){
+              if (playing) {
+                  playSound();
+              } else {
+                  document.getElementById('play_sound_button').innerHTML="PLAY";
+                  osc.stop();
+                  clearInterval(intervalId);
+              }
+          }, secs * 1000);
+    })
+    function playSound(){
         let freq = document.getElementById('frequency').value;
+        let inc = document.getElementById('increase').value;
+        let secs = document.getElementById('time').value;
+        freq = parseFloat(freq);
+        inc = parseFloat(inc);
+        secs = parseFloat(secs);
         osc.frequency.value = freq;
         document.getElementById('play_sound_button').innerHTML="PAUSE";
         osc.start();
-      } else {
-        document.getElementById('play_sound_button').innerHTML="PLAY";
-        osc.stop();
-      }
-    })
+        osc.frequency.linearRampTo(freq + inc, secs);
+        console.log(osc.frequency.value);
+    }
   </script>
 </body>
 </html>
